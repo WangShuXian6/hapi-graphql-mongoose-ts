@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  hapi-ts-server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: 'npm run start:dev'
+    environment:
+      UV_THREADPOOL_SIZE: 128
+      NODE_APP_INSTANCE: 0
+      NODE_ENV: docker
+      DB_URL: postgres://root:123@postgres/project
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./:/usr/src/app/
+  postgres:
+    build: postgres
+    volumes:
+      - ./postgres/data:/var/lib/postgres/data
