@@ -1,14 +1,25 @@
-import {Server} from '@hapi/hapi';
-import buildServer from './server';
+import { Server } from "@hapi/hapi";
+import buildServer from "./server";
+
+enum ENV {
+  "production" = "production",
+  "development" = "development",
+  "local" = "local",
+}
+
+const envPath = `.env.${ENV[process.env.NODE_ENV]}`;
+
+require("dotenv").config({ path: envPath });
+console.log("process.env", process.env);
 
 let server: Server = null;
 
 buildServer({})
-  .then(newServer => {
+  .then((newServer) => {
     server = newServer;
     return server.start().then(() => {
-      const {host, port} = server.info;
+      const { host, port } = server.info;
       console.log(`Server listening at ${host}:${port}`);
     });
   })
-  .catch(error => console.log('ERROR: ', error));
+  .catch((error) => console.log("ERROR: ", error));
