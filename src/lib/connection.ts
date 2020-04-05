@@ -13,7 +13,7 @@ export default function (config?: Config): any {
     //   );
     // }
 
-    connection = connect("mongodb://localhost:27017/task", {
+    connection = connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
