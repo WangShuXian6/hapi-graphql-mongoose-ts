@@ -3,19 +3,49 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type LoginResponse {
+  accessToken: String!
+  refreshToken: String!
+}
+
 type Mutation {
   markAsCompleted(id: Int!): Task!
   createTask(completed: Boolean!, title: String!): Task!
+  register(password: String!, email: String!): Boolean!
+  login(password: String!, email: String!): LoginResponse!
+  loginWechat(nickname: String!, avatar: String!, wechatCode: String!): LoginResponse!
 }
 
 type Query {
+  """获取任务列表"""
   fetchTasks: [Task!]!
   getTask(id: Int!): Task
+  users: [User!]!
+}
+
+"""权限"""
+enum Role {
+  ADMIN
+  USER
 }
 
 type Task {
-  id: Float!
+  """test"""
   title: String!
   completed: Boolean!
   project: Task!
+}
+
+type User {
+  name: String @deprecated(reason: "用户名称")
+
+  """用户角色"""
+  roles: [Role!]!
+
+  """密码"""
+  password: String
+
+  """邮箱"""
+  email: String
+  openId: String!
 }

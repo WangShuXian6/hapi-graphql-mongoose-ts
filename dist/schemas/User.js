@@ -26,24 +26,41 @@ const typegoose_1 = require("@typegoose/typegoose");
 const type_graphql_1 = require("type-graphql");
 //import { Mongoose, connect, Model, Document } from "mongoose";
 const mongoose_1 = require("mongoose");
+const role_1 = require("../interface/role");
 //import Project from './Project';
-let Task = class Task extends mongoose_1.Document {
+//import { Role,_Role } from "../interface/role";
+let User = class User extends mongoose_1.Document {
 };
 __decorate([
-    typegoose_1.prop({ required: true }),
-    type_graphql_1.Field({ description: "test" }),
+    typegoose_1.prop({}),
+    type_graphql_1.Field({ nullable: true, deprecationReason: "用户名称" }),
     __metadata("design:type", String)
-], Task.prototype, "title", void 0);
+], User.prototype, "name", void 0);
 __decorate([
-    typegoose_1.prop({ required: true }),
-    type_graphql_1.Field((type) => Boolean),
-    __metadata("design:type", Boolean)
-], Task.prototype, "completed", void 0);
-Task = __decorate([
+    typegoose_1.prop({ required: true, items: role_1.Role }),
+    type_graphql_1.Field((type) => [role_1.Role], { description: "用户角色" }),
+    __metadata("design:type", Array)
+], User.prototype, "roles", void 0);
+__decorate([
+    typegoose_1.prop(),
+    type_graphql_1.Field((type) => String, { nullable: true, description: "密码" }),
+    __metadata("design:type", String)
+], User.prototype, "password", void 0);
+__decorate([
+    typegoose_1.prop(),
+    type_graphql_1.Field((type) => String, { nullable: true, description: "邮箱" }),
+    __metadata("design:type", String)
+], User.prototype, "email", void 0);
+__decorate([
+    typegoose_1.prop(),
+    type_graphql_1.Field((type) => String),
+    __metadata("design:type", String)
+], User.prototype, "openId", void 0);
+User = __decorate([
     type_graphql_1.ObjectType()
-], Task);
-exports.Task = Task;
-exports.TaskModel = typegoose_1.getModelForClass(Task, {
+], User);
+exports.User = User;
+exports.UserModel = typegoose_1.getModelForClass(User, {
     schemaOptions: {
         timestamps: {
             createdAt: true,
@@ -51,4 +68,4 @@ exports.TaskModel = typegoose_1.getModelForClass(Task, {
         },
     },
 });
-//# sourceMappingURL=Task.js.map
+//# sourceMappingURL=User.js.map

@@ -24,6 +24,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const type_graphql_1 = require("type-graphql");
 const data_1 = require("../data");
 const Task_1 = require("../schemas/Task");
+const role_1 = require("../interface/role");
 let default_1 = class default_1 {
     fetchTasks() {
         return data_1.tasks;
@@ -46,6 +47,7 @@ let default_1 = class default_1 {
             return _task;
         });
     }
+    //@Authorized("ADMIN")
     createTask(title, completed, ctx) {
         return __awaiter(this, void 0, void 0, function* () {
             const { projectDatasource } = ctx.dataSources;
@@ -61,7 +63,8 @@ let default_1 = class default_1 {
     }
 };
 __decorate([
-    type_graphql_1.Query((returns) => [Task_1.Task]),
+    type_graphql_1.Authorized(),
+    type_graphql_1.Query((returns) => [Task_1.Task], { description: "获取任务列表" }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Array)
@@ -74,6 +77,7 @@ __decorate([
     __metadata("design:returntype", Object)
 ], default_1.prototype, "getTask", null);
 __decorate([
+    type_graphql_1.Authorized(role_1.Role.ADMIN),
     type_graphql_1.Mutation((returns) => Task_1.Task),
     __param(0, type_graphql_1.Arg("id", (type) => type_graphql_1.Int)),
     __param(1, type_graphql_1.Ctx()),
@@ -82,6 +86,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], default_1.prototype, "markAsCompleted", null);
 __decorate([
+    type_graphql_1.Authorized(role_1.Role.USER),
     type_graphql_1.Mutation((returns) => Task_1.Task),
     __param(0, type_graphql_1.Arg("title", (type) => String)),
     __param(1, type_graphql_1.Arg("completed", (type) => Boolean)),

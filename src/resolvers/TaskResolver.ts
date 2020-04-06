@@ -7,15 +7,19 @@ import {
   Resolver,
   Root,
   Ctx,
+  Authorized,
 } from "type-graphql";
 import { projects, tasks, TaskData } from "../data";
 import { Task } from "../schemas/Task";
 
 import { ApolloContext } from "../server";
 
+import { Role } from "../interface/role";
+
 @Resolver((of) => Task)
 export default class {
-  @Query((returns) => [Task])
+  @Authorized()
+  @Query((returns) => [Task], { description: "获取任务列表" })
   fetchTasks(): TaskData[] {
     return tasks;
   }
@@ -25,6 +29,7 @@ export default class {
     return tasks.find((task) => task.id === id);
   }
 
+  @Authorized(Role.ADMIN)
   @Mutation((returns) => Task)
   async markAsCompleted(
     @Arg("id", (type) => Int) id: number,
@@ -43,6 +48,8 @@ export default class {
     return _task;
   }
 
+  //@Authorized("ADMIN")
+  @Authorized(Role.USER)
   @Mutation((returns) => Task)
   async createTask(
     @Arg("title", (type) => String) title: string,
