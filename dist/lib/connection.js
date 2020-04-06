@@ -11,7 +11,7 @@ function default_1(config) {
         //     "connection has not been instantiated, please provide config"
         //   );
         // }
-        connection = mongoose_1.connect("mongodb://localhost:27017/task", {
+        connection = mongoose_1.connect(process.env.MONGO_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         })

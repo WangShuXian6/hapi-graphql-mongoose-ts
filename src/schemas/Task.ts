@@ -19,12 +19,12 @@ import { Model, Document } from "mongoose";
 
 @ObjectType()
 export class Task extends Document {
-  @prop()
-  @Field()
-  id: number;
+  // @prop()
+  // @Field()
+  // id: string;
 
   @prop({ required: true })
-  @Field()
+  @Field({ description: "test" })
   title: string;
 
   // @Field(type => Project)

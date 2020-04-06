@@ -22,41 +22,77 @@ require("reflect-metadata");
 const type_graphql_1 = require("type-graphql");
 //import ProjectResolver from './resolvers/ProjectResolver';
 const TaskResolver_1 = __importDefault(require("./resolvers/TaskResolver"));
+const UserResolver_1 = __importDefault(require("./resolvers/UserResolver"));
 const apollo_server_hapi_1 = require("./apollo-server-hapi");
 const Project_1 = __importDefault(require("./datasource/Project"));
 const connection_1 = __importDefault(require("./lib/connection"));
+const auth_checker_1 = require("./lib/auth-checker");
+const jsonwebtoken_1 = require("jsonwebtoken");
 function serverMethods(request) {
     return request.server.methods;
 }
 exports.serverMethods = serverMethods;
 const port = process.env.PORT || 3001;
-const host = process.env.HOST || '0.0.0.0';
+const host = process.env.HOST || "0.0.0.0";
 function buildServer(serverOpts) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { config = config_1.default.init(), providedLogger, providedConnection, serverLogs = true } = serverOpts;
+        const { config = config_1.default.init(), providedLogger, providedConnection, serverLogs = true, } = serverOpts;
         const app = new hapi_1.default.Server({
             host,
-            port
+            port,
         });
         const connection = providedConnection || connection_1.default(config);
         const projectDatasource = new Project_1.default(config, connection);
         yield app.route(routes_1.default);
         yield app.register({
             plugin: methods_1.default,
-            options: { logger: providedLogger, projectDatasource, config }
+            options: { logger: providedLogger, projectDatasource, config },
         });
         yield app.register({ plugin: logging_1.default, options: { serverLogs } });
         yield app.register(documentation_1.default);
         const schema = yield type_graphql_1.buildSchema({
-            resolvers: [TaskResolver_1.default],
-            emitSchemaFile: true
+            resolvers: [TaskResolver_1.default, UserResolver_1.default],
+            emitSchemaFile: true,
+            authChecker: auth_checker_1.authChecker,
         });
         const apolloServer = new apollo_server_hapi_1.ApolloServer({
             schema,
-            dataSources: () => ({ projectDatasource })
+            dataSources: () => ({ projectDatasource }),
+            context: (ctx) => __awaiter(this, void 0, void 0, function* () {
+                //console.log("ctx::", ctx);
+                const auth = ctx.request.headers["authorization"];
+                if (!auth)
+                    return ctx;
+                const token = auth.split(" ")[1];
+                const payload = jsonwebtoken_1.verify(token, process.env.ACCESS_TOKEN_SECRET);
+                console.log("payload", payload);
+                if (payload === null) {
+                    console.log("null");
+                    return ctx;
+                }
+                if (typeof payload === "string") {
+                    console.log("string");
+                    return ctx;
+                }
+                const userId = payload.userId;
+                const { User } = projectDatasource;
+                const user = yield User.findById(userId).lean(true);
+                console.log("user:", user);
+                if (!user) {
+                    return ctx;
+                }
+                // const roleString: string = `${Role.USER}`;
+                // ctx.user = {
+                //   id: 1,
+                //   name: "Sample user",
+                //   roles: [roleString],
+                // };
+                ctx.user = user;
+                return ctx;
+            }),
         });
         yield apolloServer.applyMiddleware({
-            app
+            app,
         });
         yield apolloServer.installSubscriptionHandlers(app.listener);
         return app;

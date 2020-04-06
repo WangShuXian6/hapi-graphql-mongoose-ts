@@ -78,7 +78,6 @@ export class ApolloServer extends ApolloServerBase {
           const prefersHTML =
             types.find((x: string) => x === 'text/html' || x === 'application/json') ===
             'text/html';
-
           if (prefersHTML) {
             const playgroundRenderPageOptions: PlaygroundRenderPageOptions = {
               endpoint: path,
